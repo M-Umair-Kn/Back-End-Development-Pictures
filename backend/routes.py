@@ -35,7 +35,7 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    return jsonify(data)
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +44,11 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    """Get a picture by its ID"""
+    for picture in data:
+        if picture.get('id') == id:
+            return jsonify(picture), 200
+    return {"message": "Picture not found"}, 404
 
 
 ######################################################################
@@ -52,7 +56,13 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    """Create a new picture"""
+    picture = request.get_json()
+    if any(p.get('id') == id for p in data):
+        return {"message": f"picture with id {id} already present"}, 302
+    picture['id'] = id  # Ensure the picture has the correct id
+    data.append(picture)
+    return jsonify(picture), 201
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +71,22 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    """Update a picture by its ID"""
+    updated_picture = request.get_json()
+    for i, picture in enumerate(data):
+        if picture.get('id') == id:
+            data[i] = updated_picture
+            return jsonify(updated_picture), 200
+    return {"message": "Picture not found"}, 404
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    """Delete a picture by its ID"""
+    for i, picture in enumerate(data):
+        if picture.get('id') == id:
+            del data[i]
+            return '', 204
+    return {"message": "Picture not found"}, 404
